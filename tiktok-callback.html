@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KindKoda — TikTok Authorization</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #010101;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 48px;
+    max-width: 560px;
+    width: 90%;
+    text-align: center;
+  }
+  .logo { font-size: 40px; margin-bottom: 16px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .sub { color: #888; font-size: 14px; margin-bottom: 32px; }
+  .code-box {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 13px;
+    color: #69C9D0;
+    text-align: left;
+    position: relative;
+  }
+  .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .copy-btn {
+    background: #69C9D0;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .copy-btn:hover { background: #4db8bf; }
+  .success { color: #4ade80; font-size: 13px; margin-top: 8px; display: none; }
+  .error-box { color: #f87171; font-size: 14px; }
+  .instructions {
+    margin-top: 28px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.8;
+  }
+  .instructions strong { color: #fff; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🎵</div>
+  <h1>TikTok Authorization</h1>
+  <p class="sub">KindKoda Uploader — OAuth Callback</p>
+
+  <div id="content"></div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+  const errorDesc = params.get('error_description');
+
+  const el = document.getElementById('content');
+
+  if (error) {
+    el.innerHTML = `
+      <div class="error-box">
+        <strong>Authorization Failed</strong><br>
+        ${errorDesc || error}
+      </div>`;
+  } else if (code) {
+    el.innerHTML = `
+      <p style="color:#4ade80;font-size:15px;margin-bottom:20px;">✅ Authorization successful!</p>
+      <div class="code-box">
+        <div class="label">Authorization Code</div>
+        <div id="code-val">${code}</div>
+      </div>
+      ${state ? `<div class="code-box"><div class="label">State</div><div>${state}</div></div>` : ''}
+      <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+      <div class="success" id="copied">✓ Copied to clipboard!</div>
+      <div class="instructions">
+        <strong>Next step:</strong><br>
+        Copy the authorization code above and paste it into your terminal where the OAuth flow is waiting.<br><br>
+        Run in your project: <code style="color:#69C9D0">python src/uploaders/tiktok_oauth.py --code "&lt;paste here&gt;"</code>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <p style="color:#888;font-size:14px;">No authorization code found in the URL.<br>This page is used as a redirect callback for TikTok OAuth.</p>`;
+  }
+
+  function copyCode() {
+    const code = document.getElementById('code-val').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      document.getElementById('copied').style.display = 'block';
+      setTimeout(() => document.getElementById('copied').style.display = 'none', 2000);
+    });
+  }
+</script>
+</body>
+</html>
