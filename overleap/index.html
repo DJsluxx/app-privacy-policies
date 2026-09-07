@@ -105,8 +105,15 @@
     scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
   }
   .shots img {
-    flex: 0 0 auto; width: 174px; border-radius: 12px;
-    border: 1px solid var(--line); scroll-snap-align: center;
+    /* height:auto is load-bearing. The width/height attributes on these images
+       are presentational hints, so setting only width in CSS leaves the 978px
+       height hint standing and every shot is squashed into a tall smear. */
+    flex: 0 0 auto;
+    width: clamp(174px, 30vw, 250px);
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    scroll-snap-align: center;
   }
 
   .card {
